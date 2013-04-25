@@ -43,7 +43,7 @@
 #include <errno.h>
 #include <err.h>
 
-#define MAX_PKTSIZE	2048	/* big enough for 1500 byte MTU */
+#define MAX_PKTSIZE	(65536+8)	/* will packets ever be bigger? */
 
 /* packet buffer structure */
 struct pbuf {
@@ -130,7 +130,7 @@ main(int argc, char **argv)
 	int	ch, fda, fdb;
 
 	while ((ch = getopt(argc, argv,
-	    "b:d:l:n:p:qs:v")) != EOF) {
+	    "l:n:o:qv")) != EOF) {
 		switch (ch) {
 		case 'l':
 			queue_limit = (int)strtol(optarg, NULL, 0);
@@ -235,6 +235,7 @@ event_loop(int fda, int fdb)
 void
 print_stats(void)
 {
+#if 0
 	long	t;
 	u_int64_t	diff_sent_packets, diff_sent_bytes;
 
@@ -260,6 +261,7 @@ print_stats(void)
 	    / diff_sent_packets : 0);
 
 	last_stats = stats;
+#endif
 }
 
 void
@@ -335,8 +337,8 @@ read_packet(int fd)
 	stats.rcvd_bytes += n;
 
 	if (verbose > 0) {
-		fprintf(stderr, "read_packet: %u bytes seq=%u\n",
-		    p->pb_len, p->pb_seq);
+		fprintf(stderr, "%2d: read_packet: %u bytes seq=%u\n",
+		    fd, p->pb_len, p->pb_seq);
 		if (verbose > 1)
 			pbuf_dump(p);
 	}
@@ -353,8 +355,8 @@ write_packet(int fd, struct pbuf *p)
 	if (n != p->pb_len)
 		warnx("write_packet: wrote only %u/%u bytes", n, p->pb_len);
 	if (verbose > 0)
-		fprintf(stderr, "write_packet: wrote %u bytes seq=%u\n",
-			    n, p->pb_seq);
+		fprintf(stderr, "%2d: write_packet: wrote %u bytes seq=%u\n",
+			    fd, n, p->pb_seq);
 	free(p);
 	stats.sent_packets++;
 	stats.sent_bytes += n;
