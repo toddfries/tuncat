@@ -1,0 +1,54 @@
+
+tunbridge(1) emulate a long, possibly lossy, link using the tun device.
+tunbridge(1) reads packets from the tun(4) device, creates a delay,
+packet loss, and packet shaping, and then, reinjects the packets to the
+same tun device.
+
+tunbridge(1) reports statistics every 5 seconds, or when the SIGUSR1
+signal is received.
+
+Note that, since the delay is controlled in the userland, the
+precision is affected by process scheduling.
+Also note that the precision of the delay and shaping control is
+limited by the kernel clock tick granularity (10ms in popular
+platforms).
+
+tunbridge(1) is developed on OpenBSD but it should work on other BSDs.
+
+HOW TO INSTALL
+	% make
+	# make install
+
+HOW TO SET UP
+    The system must be configured to send packets to the tun device and
+    properly handle reinjected packets.  Care should be taken not to
+    create a loop for reinjected packets.
+    The following example shows a simple pf.conf(5)
+    to redirect packets destined to a specific host to the emulated link.
+
+	tun_if = "tun0"
+	int_if = "em0"
+	pass in quick on $int_if route-to $tun_if from any to 192.0.2.1
+
+    In order to forward reinjected packets, packet forwarding needs to
+    be enabled, which usually needs the following line in /etc/sysctl.conf.
+
+	net.inet.ip.forwarding=1
+
+HOW TO USE
+    The following exmaples demonstrates how to use tunbridge(1).
+    To emulate a link with 400 ms delay,
+
+	tunbridge -d 400
+
+    To emulate a 128Kb link with 300 ms delay,
+
+	tunbridge -s 128Kb -d 300
+
+    To emulate a 1.5Mb link with 100 ms delay and 1% packet loss using
+    /dev/tun1,
+
+	tunbridge -s 1.5Mb -d 100 -p 0.01 -n /dev/tun1
+
+CHANGES
+2005/05/31	version 0.1 for beta test
