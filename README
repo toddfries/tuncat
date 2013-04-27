@@ -1,19 +1,14 @@
+This was inspired by tunbridge(1).
 
-tunbridge(1) emulate a long, possibly lossy, link using the tun device.
-tunbridge(1) reads packets from the tun(4) device, creates a delay,
-packet loss, and packet shaping, and then, reinjects the packets to the
-same tun device.
+The reason I can't just use a bridge(4) device is because some
+properties of packets are preserved in copying them around the kernel
+and a userland set of tun(4) devices connected to each other avoids this
+nicely.
 
-tunbridge(1) reports statistics every 5 seconds, or when the SIGUSR1
-signal is received.
+If something else does this same task 'better' let me know, until then,
+there is tuncat(1).
 
-Note that, since the delay is controlled in the userland, the
-precision is affected by process scheduling.
-Also note that the precision of the delay and shaping control is
-limited by the kernel clock tick granularity (10ms in popular
-platforms).
-
-tunbridge(1) is developed on OpenBSD but it should work on other BSDs.
+tuncat(1) is developed on OpenBSD but it should work on other BSDs.
 
 HOW TO INSTALL
 	% make
@@ -36,19 +31,10 @@ HOW TO SET UP
 	net.inet.ip.forwarding=1
 
 HOW TO USE
-    The following exmaples demonstrates how to use tunbridge(1).
-    To emulate a link with 400 ms delay,
+    The following exmaples demonstrates how to use tuncat(1).
+    To emulate a link.
 
-	tunbridge -d 400
-
-    To emulate a 128Kb link with 300 ms delay,
-
-	tunbridge -s 128Kb -d 300
-
-    To emulate a 1.5Mb link with 100 ms delay and 1% packet loss using
-    /dev/tun1,
-
-	tunbridge -s 1.5Mb -d 100 -p 0.01 -n /dev/tun1
+	tuncat -n /dev/tun0 -o /dev/tun1
 
 CHANGES
 2005/05/31	version 0.1 for beta test
