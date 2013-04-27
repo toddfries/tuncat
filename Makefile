@@ -1,7 +1,7 @@
 PREFIX?=	/usr/local
 
-PROG=	tunbridge
-OBJS=	tunbridge.o
+PROG=	tuncat
+OBJS=	tuncat.o
 
 CFLAGS=	-g -Wall
 
@@ -10,7 +10,7 @@ all: $(PROG)
 install: $(PROG)
 	$(INSTALL) $(COPY) -m 0755 $(PROG) $(PREFIX)/bin
 
-tunbridge: $(OBJS)
+tuncat: $(OBJS)
 	$(CC) $(CFLAGS) $(INCLUDES) $(DEFINES) -o $@ $(OBJS) $(LIBS)
 
 .c.o:
